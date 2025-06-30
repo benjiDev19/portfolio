@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+  -->
+    <base href="$FLUTTER_BASE_HREF">
+
+    <meta charset="UTF-8">
+    <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="This is my professional Portfolio for all the work related to technology">
+    <meta name="theme-color" content="#0175C2">
+
+    <!-- iOS meta tags & icons -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="benjiDev">
+    <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <title>benjiDev</title>
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Preload essential assets -->
+    <link rel="preload" href="main.dart.js" as="script">
+    <link rel="preload" href="./assets/futuristic_loading.gif" as="image">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Rajdhani', 'BlinkMacSystemFont', 'Segoe UI', sans-serif;
+            background-color: #050A18;
+            overflow: hidden;
+            color: #E0F7FF;
+        }
+
+        @font-face {
+            font-family: 'Rajdhani';
+            font-style: normal;
+            font-weight: 500;
+            font-display: swap;
+            src: url(https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-brands-400.woff2) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+
+        #loading_indicator {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #050A18 0%, #071426 50%, #0A2342 100%);
+            transition: opacity 0.7s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .loader-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+
+        .hexagon {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: 2px solid rgba(0, 195, 255, 0.1);
+            clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+            animation: rotateHex 8s linear infinite;
+        }
+
+        .hexagon:nth-child(1) {
+            border-color: rgba(0, 195, 255, 0.3);
+            animation-duration: 6s;
+        }
+
+        .hexagon:nth-child(2) {
+            transform: scale(0.85);
+            border-color: rgba(0, 225, 255, 0.5);
+            animation-duration: 4s;
+            animation-direction: reverse;
+        }
+
+        .hexagon:nth-child(3) {
+            transform: scale(0.7);
+            border-color: rgba(0, 255, 235, 0.7);
+            animation-duration: 3s;
+        }
+
+        .circle-pulse {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 65px;
+            height: 65px;
+            background: rgba(0, 210, 255, 0.15);
+            border-radius: 50%;
+            animation: pulse 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+        }
+
+        .loader-image {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40%;
+            height: X;
+            object-fit: contain;
+            z-index: 2;
+            filter: drop-shadow(0 0 8px rgba(0, 210, 255, 0.7));
+            border-radius: 50%
+        }
+
+        .loader-text {
+            margin-top: 40px;
+            font-size: 20px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #7ADFFF;
+            text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+            animation: textPulse 2s infinite alternate;
+        }
+
+        .loading-progress {
+            width: 240px;
+            height: 2px;
+            background-color: rgba(0, 210, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 25px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 0 8px rgba(0, 210, 255, 0.3);
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 30%;
+            background: linear-gradient(90deg, transparent, #00D1FF, transparent);
+            position: absolute;
+            filter: blur(1px);
+            animation: progressAnimation 1.5s ease-in-out infinite;
+        }
+
+        .data-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.3;
+            overflow: hidden;
+        }
+
+        .data-line {
+            position: absolute;
+            background: linear-gradient(to bottom, transparent, #00D1FF, transparent);
+            width: 1px;
+            height: 30%;
+            opacity: 0;
+            animation: dataLineAnimation 6s linear infinite;
+        }
+
+        @keyframes dataLineAnimation {
+            0% {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(500%);
+                opacity: 0;
+            }
+        }
+
+        @keyframes rotateHex {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0.5;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes textPulse {
+            0% {
+                opacity: 0.7;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes progressAnimation {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(500%); }
+        }
+    </style>
+
+    <!-- Deferred AdSense loading -->
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const adScript = document.createElement('script');
+                adScript.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7459600930028673";
+                adScript.async = true;
+                adScript.crossOrigin = "anonymous";
+                document.head.appendChild(adScript);
+            }, 3000);
+        });
+    </script>
+</head>
+
+<body>
+<div id="loading_indicator">
+    <div class="data-lines">
+        <!-- Auto-generated data lines -->
+    </div>
+    <div class="loader-container">
+        <div class="hexagon"></div>
+        <div class="hexagon"></div>
+        <div class="hexagon"></div>
+        <div class="circle-pulse"></div>
+        <img class="loader-image" src="./assets/futuristic_loading.gif" alt="Loading">
+    </div>
+    <div class="loader-text">Initializing System</div>
+    <div class="loading-progress">
+        <div class="progress-bar"></div>
+    </div>
+</div>
+
+<!-- This script installs service_worker.js to provide PWA functionality -->
+<script>
+        var scriptLoaded = false;
+
+        function loadMainDartJs() {
+            if (scriptLoaded) {
+                return;
+            }
+            scriptLoaded = true;
+            var scriptTag = document.createElement('script');
+            scriptTag.src = 'main.dart.js';
+            scriptTag.type = 'application/javascript';
+            document.body.append(scriptTag);
+        }
+
+        // Create animated data lines
+        function createDataLines() {
+            const dataLinesContainer = document.querySelector('.data-lines');
+            const numLines = 15;
+
+            for (let i = 0; i < numLines; i++) {
+                const line = document.createElement('div');
+                line.className = 'data-line';
+
+                // Random position and delay
+                const posX = Math.random() * 100;
+                const delay = Math.random() * 5;
+                const duration = 3 + Math.random() * 3;
+                const opacity = 0.1 + Math.random() * 0.4;
+
+                line.style.left = `${posX}%`;
+                line.style.animationDelay = `${delay}s`;
+                line.style.animationDuration = `${duration}s`;
+                line.style.opacity = opacity;
+
+                dataLinesContainer.appendChild(line);
+            }
+        }
+
+        // Update loading text with dynamic messages
+        function updateLoadingMessages() {
+            const messages = [
+                "Initializing System",
+                "Loading Assets",
+                "Calibrating Interface",
+                "Establishing Connection",
+                "Synchronizing Data"
+            ];
+
+            const loaderText = document.querySelector('.loader-text');
+            let messageIndex = 0;
+
+            setInterval(() => {
+                loaderText.style.opacity = 0;
+
+                setTimeout(() => {
+                    messageIndex = (messageIndex + 1) % messages.length;
+                    loaderText.textContent = messages[messageIndex];
+                    loaderText.style.opacity = 1;
+                }, 500);
+            }, 3000);
+        }
+
+        // Track loading progress
+        let loadingProgress = 0;
+        const progressInterval = setInterval(() => {
+            loadingProgress += 5;
+            if (loadingProgress >= 100) {
+                clearInterval(progressInterval);
+            }
+        }, 500);
+
+        if ('serviceWorker' in navigator) {
+                // Service workers are supported. Use them.
+                window.addEventListener('load', function() {
+                    // Wait for registration to finish before dropping the <script> tag.
+                    // Using the recommended Flutter template token for service worker version
+                    var serviceWorkerVersion = '{{flutter_service_worker_version}}';
+                    var serviceWorkerUrl = 'flutter_service_worker.js?v=' + serviceWorkerVersion;
+                    navigator.serviceWorker.register(serviceWorkerUrl)
+                        .then((reg) => {
+                            function waitForActivation(serviceWorker) {
+                                serviceWorker.addEventListener('statechange', () => {
+                                    if (serviceWorker.state == 'activated') {
+                                        console.log('Installed new service worker.');
+                                        loadMainDartJs();
+                                    }
+                                });
+                            }
+                            if (!reg.active && (reg.installing || reg.waiting)) {
+                                // No active web worker and we have installed or are installing
+                                // one for the first time. Simply wait for it to activate.
+                                waitForActivation(reg.installing || reg.waiting);
+                            } else if (!reg.active.scriptURL.endsWith(serviceWorkerVersion)) {
+                                // When the app updates the version changes, so we need to ask the service worker to update.
+                                console.log('New service worker available.');
+                                reg.update();
+                                waitForActivation(reg.installing);
+                            } else {
+                                // Existing service worker is still good.
+                                console.log('Loading app from service worker.');
+                                loadMainDartJs();
+                            }
+                        });
+
+                    // If service worker doesn't succeed in a reasonable amount of time,
+                    // fallback to plain <script> tag.
+                    setTimeout(() => {
+                        if (!scriptLoaded) {
+                            console.warn(
+                                'Failed to load app from service worker. Falling back to plain <script> tag.',
+                            );
+                            loadMainDartJs();
+                        }
+                    }, 4000);
+                });
+            } else {
+                // Service workers not supported. Just drop the <script> tag.
+                loadMainDartJs();
+            }
+    </script>
+
+<script>
+        // More responsive loading screen handling
+        document.addEventListener("DOMContentLoaded", function() {
+            // Initialize futuristic UI elements
+            createDataLines();
+            updateLoadingMessages();
+
+            const mainDartLoaded = new Promise((resolve) => {
+                window.addEventListener('flutter-first-frame', resolve);
+            });
+
+            Promise.all([
+                mainDartLoaded,
+                new Promise(resolve => setTimeout(resolve, 1500)) // Minimum display time
+            ]).then(() => {
+                const loadingIndicator = document.getElementById('loading_indicator');
+                if (loadingIndicator) {
+                    loadingIndicator.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingIndicator.style.display = 'none';
+                    }, 700);
+                }
+            });
+
+            // Fallback if flutter-first-frame doesn't fire
+            setTimeout(() => {
+                const loadingIndicator = document.getElementById('loading_indicator');
+                if (loadingIndicator && loadingIndicator.style.opacity !== '0') {
+                    loadingIndicator.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingIndicator.style.display = 'none';
+                    }, 700);
+                }
+            }, 8000);
+        });
+    </script>
+</body>
+
+</html>
